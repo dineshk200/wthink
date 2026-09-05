@@ -38,7 +38,7 @@ def save_state(state):
 
 def init_field_state(min_v, max_v):
     return {
-        "value": round((min_v + max_v) / 2, 6),
+        "value": round(random.uniform(min_v, max_v), 6),
         "direction": random.choice([-1, 0, 1]),
         "remaining": random.randint(3, 4),
     }
