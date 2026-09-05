@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write   # needed so the workflow can commit state.json back
+  contents: write
 
 concurrency:
-  group: thingspeak-update   # only one run at a time, prevents push conflicts
+  group: thingspeak-update
   cancel-in-progress: false
 
 jobs:
