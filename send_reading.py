@@ -15,14 +15,14 @@ import random
 from datetime import datetime
 import requests
 
-WRITE_API_KEY = "1PB3KHDRUTOQIZCH"     # your ThingSpeak Write API key
+WRITE_API_KEY = "UPF58QASZWBIH0VH"     # your ThingSpeak Write API key
 WRITE_URL = "https://api.thingspeak.com/update"
 STATE_FILE = "state.json"
 
 # name: (min, max, step_size, decimal_places)
 FIELD_CONFIG = {
     "field1": (7.10, 7.65, 0.02, 2),    # pH
-    "field3": (0.30, 0.40, 0.004, 6),
+    "field3": (0.02, 0.04, 0.0006, 6),
     "field4": (25, 40, 1.2, 6),
 }
 
