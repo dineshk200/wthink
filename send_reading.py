@@ -54,12 +54,12 @@ def next_value(field_name, state, min_v, max_v, step_size, decimals):
     move = fs["direction"] * step_size * random.uniform(0.7, 1.3)
     new_value = fs["value"] + move
 
-    # if it hits an edge, clamp and force a direction change next time
+    # if it hits an edge, clamp near it (not exactly on it) and force a direction change
     if new_value >= max_v:
-        new_value = max_v
+        new_value = max_v - random.uniform(0.00001, step_size)
         fs["remaining"] = 0
     elif new_value <= min_v:
-        new_value = min_v
+        new_value = min_v + random.uniform(0.00001, step_size)
         fs["remaining"] = 0
     else:
         fs["remaining"] -= 1
