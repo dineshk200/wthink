@@ -1,17 +1,17 @@
 {
   "field1": {
-    "value": 7.37,
+    "value": 7.39,
     "direction": 1,
-    "remaining": 3
+    "remaining": 2
   },
   "field3": {
-    "value": 0.028704,
-    "direction": 0,
-    "remaining": 0
+    "value": 0.028039,
+    "direction": -1,
+    "remaining": 3
   },
   "field4": {
-    "value": 28.319364,
+    "value": 27.295725,
     "direction": -1,
-    "remaining": 1
+    "remaining": 0
   }
 }
