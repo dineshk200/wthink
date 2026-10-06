@@ -1,23 +1,25 @@
 """
-ThingSpeak single-update sender with SIMULATED DRIFT PATTERN.
-No fetching from ThingSpeak -- state (current value + trend) is kept in
-state.json inside this repo, which the GitHub Actions workflow commits
-back after every run.
-
-Pattern: each field moves in the same direction (up/down/flat) for a
-run of 3-4 readings, then picks a new direction -- similar to a real
-drifting sensor rather than pure random noise each time.
+ThingSpeak multi-channel sender with SIMULATED DRIFT PATTERN.
+Each channel has its own API key and its own independent drift state
+(kept in state.json), so every channel shows different readings
+in the same format.
 """
 
 import json
 import os
 import random
+import time
 from datetime import datetime
 import requests
 
-WRITE_API_KEY = "UPF58QASZWBIH0VH"     # your ThingSpeak Write API key
 WRITE_URL = "https://api.thingspeak.com/update"
 STATE_FILE = "state.json"
+
+# name -> write API key. Add more channels here if needed.
+CHANNELS = {
+    "channel1": "1PB3KHDRUTOQIZCH",
+    "channel2": "IDTILLJTR5XX1C0Q",
+}
 
 # name: (min, max, step_size, decimal_places)
 FIELD_CONFIG = {
@@ -46,15 +48,13 @@ def init_field_state(min_v, max_v):
 def next_value(field_name, state, min_v, max_v, step_size, decimals):
     fs = state.get(field_name, init_field_state(min_v, max_v))
 
-    # time to pick a new direction / run length
     if fs["remaining"] <= 0:
-        fs["direction"] = random.choice([-1, 0, 1])  # down, flat, up
+        fs["direction"] = random.choice([-1, 0, 1])
         fs["remaining"] = random.randint(3, 4)
 
     move = fs["direction"] * step_size * random.uniform(0.7, 1.3)
     new_value = fs["value"] + move
 
-    # if it hits an edge, clamp near it (not exactly on it) and force a direction change
     if new_value >= max_v:
         new_value = max_v - random.uniform(0.00001, step_size)
         fs["remaining"] = 0
@@ -69,39 +69,44 @@ def next_value(field_name, state, min_v, max_v, step_size, decimals):
     state[field_name] = fs
     return new_value
 
-def main():
-    state = load_state()
+def send_channel(name, api_key, all_state):
+    if api_key.startswith("PUT_"):
+        print(f"[{name}] API key not set, skipping.")
+        return
 
-    field1 = next_value("field1", state, *FIELD_CONFIG["field1"])
-    field2 = 0
-    field3 = next_value("field3", state, *FIELD_CONFIG["field3"])
-    field4 = next_value("field4", state, *FIELD_CONFIG["field4"])
-    field5 = 25   # constant temperature
+    ch_state = all_state.setdefault(name, {})
 
-    save_state(state)
-
-    # force exactly 6 decimal places for field3/field4 (e.g. 0.340000, not 0.34)
-    field3_str = f"{field3:.6f}"
-    field4_str = f"{field4:.6f}"
+    field1 = next_value("field1", ch_state, *FIELD_CONFIG["field1"])
+    field3 = next_value("field3", ch_state, *FIELD_CONFIG["field3"])
+    field4 = next_value("field4", ch_state, *FIELD_CONFIG["field4"])
 
     params = {
-        "api_key": WRITE_API_KEY,
+        "api_key": api_key,
         "field1": field1,
-        "field2": field2,
-        "field3": field3_str,
-        "field4": field4_str,
-        "field5": field5,
+        "field2": 0,
+        "field3": f"{field3:.6f}",
+        "field4": f"{field4:.6f}",
+        "field5": 25,
     }
 
-    response = requests.get(WRITE_URL, params=params, timeout=15)
-    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        response = requests.get(WRITE_URL, params=params, timeout=15)
+        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if response.status_code == 200 and response.text != "0":
+            print(f"[{ts}] [{name}] Sent OK | entry_id={response.text} | "
+                  f"f1={field1} f3={params['field3']} f4={params['field4']}")
+        else:
+            print(f"[{ts}] [{name}] ThingSpeak returned: {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"[{name}] Network error: {e}")
 
-    if response.status_code == 200 and response.text != "0":
-        print(f"[{ts}] Sent OK | entry_id={response.text} | "
-              f"field1={field1} field2={field2} field3={field3_str} field4={field4_str} field5={field5}")
-    else:
-        print(f"[{ts}] ThingSpeak returned: {response.text} "
-              f"(0 usually means rate limit hit or wrong API key)")
+def main():
+    state = load_state()
+    for i, (name, key) in enumerate(CHANNELS.items()):
+        if i > 0:
+            time.sleep(2)   # small gap between channels
+        send_channel(name, key, state)
+    save_state(state)
 
 if __name__ == "__main__":
     main()
