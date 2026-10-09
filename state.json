@@ -2,35 +2,35 @@
   "channel1": {
     "field1": {
       "value": 7.51,
-      "direction": 1,
-      "remaining": 0
+      "direction": 0,
+      "remaining": 3
     },
     "field3": {
       "value": 0.022385,
       "direction": 0,
-      "remaining": 1
+      "remaining": 0
     },
     "field4": {
       "value": 29.961493,
       "direction": 0,
-      "remaining": 2
+      "remaining": 1
     }
   },
   "channel2": {
     "field1": {
       "value": 7.38,
-      "direction": 1,
-      "remaining": 0
+      "direction": 0,
+      "remaining": 2
     },
     "field3": {
       "value": 0.029589,
       "direction": 0,
-      "remaining": 3
+      "remaining": 2
     },
     "field4": {
       "value": 39.631423,
       "direction": 0,
-      "remaining": 2
+      "remaining": 1
     }
   }
 }
