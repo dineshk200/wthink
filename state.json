@@ -3,15 +3,15 @@
     "field1": {
       "value": 7.41,
       "direction": 0,
-      "remaining": 1
+      "remaining": 0
     },
     "field3": {
-      "value": 0.021943,
+      "value": 0.021447,
       "direction": -1,
-      "remaining": 1
+      "remaining": 0
     },
     "field4": {
-      "value": 39.547525,
+      "value": 38.964039,
       "direction": 1,
       "remaining": 0
     }
@@ -20,17 +20,17 @@
     "field1": {
       "value": 7.6,
       "direction": 0,
-      "remaining": 2
+      "remaining": 1
     },
     "field3": {
-      "value": 0.020276,
-      "direction": 0,
-      "remaining": 0
+      "value": 0.020766,
+      "direction": 1,
+      "remaining": 2
     },
     "field4": {
-      "value": 36.995952,
+      "value": 38.324275,
       "direction": 1,
-      "remaining": 1
+      "remaining": 0
     }
   }
 }
